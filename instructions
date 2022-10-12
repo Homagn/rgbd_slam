@@ -1,0 +1,74 @@
+#==============================================
+#==============================================
+(Steps to create a reusable docker container)
+
+(assuming cloning the repo in /home/homag/Desktop/slam)
+git clone https://github.com/JingwenWang95/KinectFusion.git
+
+
+cd to the docker file location 
+docker build -t kinfusion .
+
+(after the container is built)
+xhost +
+
+sudo nvidia-docker run --rm -ti --mount type=bind,source=/home/homag/Desktop/slam,target=/slam --mount type=bind,source=/home/homag/Desktop/datasets,target=/datasets --privileged --net=host --ipc=host -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix --env="QT_X11_NO_MITSHM=1" kinfusion:latest
+(now youre inside the container)
+
+(install anaconda and get set up)
+wget https://repo.anaconda.com/archive/Anaconda3-2022.05-Linux-x86_64.sh
+bash Anaconda3-2022.05-Linux-x86_64.sh
+cd ~
+source .bashrc
+
+cd /slam/KinectFusion/
+
+
+conda env create -f environment.yml
+
+conda activate kinfu
+cd /slam/KinectFusion/
+(go to the link below and data will download)
+https://vision.in.tum.de/rgbd/dataset/freiburg1/rgbd_dataset_freiburg1_desk.tgz
+(extract the downloaded tz file from the downloaded location to KinectFusion/datasets/ folder)
+
+cd /
+mkdir assets
+change the KinectFusion/configs/fr1_desk.yaml file first line to point to /assets/rgbd_dataset_freiburg1_desk
+cd /slam/KinectFusion/dataset/
+cp -r rgbd_dataset_freiburg1_desk/ /assets/rgbd_dataset_freiburg1_desk
+
+python preprocess.py --config ../configs/fr1_desk.yaml
+
+(done)
+(open up a seperate terminal )
+docker ps
+(copy the id of the running docker container)
+sudo docker commit <id> <name of the image>
+(eg - sudo docker commit 80d445e76b93 kinfusion)
+
+
+
+
+#==============================================
+#==============================================
+(Steps to do everytime to run the code)
+
+
+
+(open datasets/preprocess.py file and edit the top lines as follows)
+	import os
+	import sys
+	os.environ['top'] = '../'
+	sys.path.append(os.path.join(os.environ['top']))
+
+
+
+
+
+cd ..
+python kinfu_gui.py --config configs/fr1_desk.yaml
+(now you should see the live reconstruction in open3d window)
+
+
+
