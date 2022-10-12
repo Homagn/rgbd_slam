@@ -5,6 +5,6 @@
 
 xhost +
 
-sudo nvidia-docker run --rm -ti --mount type=bind,source=$(pwd),target=/slam --privileged --net=host --ipc=host -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix --env="QT_X11_NO_MITSHM=1" kinfusion:latest
+sudo nvidia-docker run --rm -ti --mount type=bind,source=$(pwd),target=/slam --privileged --net=host --ipc=host -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix --env="QT_X11_NO_MITSHM=1" homagni/kinfusion:latest
 
 
