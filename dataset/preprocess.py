@@ -1,6 +1,5 @@
 import os
 import sys
-
 os.environ['top'] = '../'
 sys.path.append(os.path.join(os.environ['top']))
 
@@ -8,7 +7,7 @@ import math
 import shutil
 import numpy as np
 import argparse
-from tum_rgbd import get_calib
+from dataset.tum_rgbd import get_calib
 from utils import load_config
 
 
