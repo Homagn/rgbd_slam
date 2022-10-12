@@ -15,6 +15,19 @@ def get_calib():
     }
 
 
+def compose_projection_matrix(K, R, t):
+    
+    print("K, R, t, ", K, R, t,"\n")
+
+    t = -R@t[:3] / t[3] # why ? - look at this post - https://github.com/sxyu/pixel-nerf/issues/10
+    R_t = np.concatenate([R,t], axis=1) # [R|t]
+    #print("R_t ",R_t)
+    p_back = np.matmul(K,R_t) # A[R|t]
+    #print("p back ",p_back)
+    #import sys
+    #sys.exit(0)
+    return p_back
+
 # Note,this step converts w2c (Tcw) to c2w (Twc)
 def load_K_Rt_from_P(P):
     """
@@ -24,6 +37,9 @@ def load_K_Rt_from_P(P):
     K = out[0]
     R = out[1]
     t = out[2]
+
+    #print("R, t ",R, t)
+
 
     K = K/K[2,2]
     intrinsics = np.eye(4)
@@ -61,12 +77,57 @@ class TUMDataset(torch.utils.data.Dataset):
 
         # root should be tum_sequence
         data_path = path.join(rootdir, "processed")
+
+        '''
+        #####################################################
+        #option 0 (original code)
+        
         cam_file = path.join(data_path, "cameras.npz")
         print("LOAD DATA", data_path)
-
         # world_mats, normalize_mat
         cam_dict = np.load(cam_file)
         world_mats = cam_dict["world_mats"]  # K @ w2c
+        '''
+
+
+        
+        #####################################################
+        #option 1
+        #alternatively assume knowledge of only 1 starting initial pose
+        calib_matrix = np.array([[5.17306408e+02, 2.93458214e-07, 3.18643040e+02],
+                                 [0.00000000e+00, 5.16469215e+02, 2.55313989e+02],
+                                 [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]])
+
+        R1 = np.array([[ 0.87584501,  0.4820233,   0.02343189],
+                     [ 0.34250043, -0.58665613, -0.7338447 ],
+                     [-0.33998378,  0.65075965, -0.67891303]])
+        t1 = np.array([[-0.54766515],
+                     [-0.35377076],
+                     [-0.63333554],
+                     [-0.41688753]]).reshape((4,1))
+
+        
+        #try changing into random rot and trans (I think any initial rot and trans matrix can be used !)
+        R1 = np.array([[ 0.98420474,  0.14473649,  0.10194301],
+                     [ 0.15877395, -0.46694816, -0.86991393],
+                     [-0.07830619,  0.87235931, -0.48255297]])
+        t1 = np.array([[ 0.0112875 ],
+                     [ 0.08123577],
+                     [-0.81748835],
+                     [-0.57007556]]).reshape((4,1))
+        
+
+        pose1 = compose_projection_matrix(calib_matrix,R1,t1)
+
+        ini_pose = pose1
+        tentative_poses = [ini_pose for _ in range(572)]
+        world_mats = np.stack(tentative_poses, axis=0)
+        
+
+
+
+
+
 
         d_min = []
         d_max = []
@@ -80,6 +141,8 @@ class TUMDataset(torch.utils.data.Dataset):
                 break
 
             intrinsics, c2w = load_K_Rt_from_P(world_mat)
+            #print("intrinsics ",intrinsics)
+
             c2w = torch.tensor(c2w, dtype=torch.float32)
             # read images
             rgb = np.array(imageio.imread(path.join(data_path, "rgb/{:04d}.png".format(i)))).astype(np.float32)
@@ -149,6 +212,8 @@ class TUMDatasetOnline(torch.utils.data.Dataset):
         # root should be tum_sequence
         data_path = path.join(rootdir, "processed")
         cam_file = path.join(data_path, "cameras.npz")
+        
+
         print("LOAD DATA", data_path)
 
         # world_mats, normalize_mat
