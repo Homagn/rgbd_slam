@@ -15,4 +15,6 @@ An implementation of Kinect fusion (reconstruct surfaces from rgb and depth imag
 
 4.cd to the location inside the container where you attached this github repo
 
-5.python kinfu_gui.py --config configs/fr1_desk.yaml
+5.conda activate kinfu
+
+6.python kinfu_gui.py --config configs/fr1_desk.yaml
