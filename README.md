@@ -5,6 +5,8 @@ An implementation of Kinect fusion (reconstruct surfaces from rgb and depth imag
 
 2.git clone this repo and cd inside
 
+(check the comments in scripts/start_container.bash and modify accordingly)
+
 3.cd scripts/start_container.bash
 
 (start visualizing a demo on frieberg dataset)
