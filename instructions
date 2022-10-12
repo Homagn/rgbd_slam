@@ -36,9 +36,9 @@ cd /
 mkdir assets
 change the KinectFusion/configs/fr1_desk.yaml file first line to point to /assets/rgbd_dataset_freiburg1_desk
 cd /slam/KinectFusion/dataset/
-cp -r rgbd_dataset_freiburg1_desk/ /assets/rgbd_dataset_freiburg1_desk
 
 python preprocess.py --config ../configs/fr1_desk.yaml
+cp -r rgbd_dataset_freiburg1_desk/ /assets/rgbd_dataset_freiburg1_desk
 
 (done)
 (open up a seperate terminal )
@@ -54,7 +54,7 @@ sudo docker commit <id> <name of the image>
 #==============================================
 (Steps to do everytime to run the code)
 
-
+conda activate kinfu
 
 (open datasets/preprocess.py file and edit the top lines as follows)
 	import os
