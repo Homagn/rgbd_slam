@@ -9,6 +9,8 @@ An implementation of Kinect fusion (reconstruct surfaces from rgb and depth imag
 
 3.cd scripts
 
+chmod +x start_container.bash
+
 ./start_container.bash
 
 (start visualizing a demo on frieberg dataset)
